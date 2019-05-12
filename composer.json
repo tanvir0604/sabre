@@ -1,0 +1,17 @@
+{
+    "name": "tanvir/sabre",
+    "description": "Composer package for sabre flight booking api",
+    "type": "comopser-plugin",
+    "authors": [
+        {
+            "name": "Md Shafkat Hussain Tanvir",
+            "email": "tanvir0604@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Tanvir\\Sabre\\": "src/"
+        }
+    }
+}
