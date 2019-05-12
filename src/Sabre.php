@@ -9,6 +9,11 @@ class Sabre{
         }
         
     }
+
+    public function call($param1, $param2)
+    {
+        return $this->api->call($param1, $param2);
+    }
     public function bergainFinderMax($origin, $destination, $departureDate)
     {
         return $this->api->bergainFinderMax($origin, $destination, $departureDate);
