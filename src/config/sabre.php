@@ -2,8 +2,8 @@
 return [
     'env' => env('SABRE_ENV', 'test'),
     'test' => [
-        'soap' => 'https://api.test.sabre.com',
-        'rest' => 'https://api.test.sabre.com',
+        'soap' => 'https://sws-crt.cert.havail.sabre.com',
+        'rest' => 'https://api-crt.cert.havail.sabre.com',
         'userId' => 'ctyk3ou66mgrtghg',
         'group' => 'DEVCENTER',
         'domain' => 'EXT',
@@ -17,8 +17,8 @@ return [
         'EnhancedAirBookRQVersion' => '3.2.0'
     ],
     'production' => [
-        'soap' => 'https://api.test.sabre.com',
-        'rest' => 'https://api.test.sabre.com',
+        'soap' => 'https://webservices.havail.sabre.com',
+        'rest' => 'https://api.havail.sabre.com',
         'userId' => 'ctyk3ou66mgrtghg',
         'group' => 'DEVCENTER',
         'domain' => 'EXT',
