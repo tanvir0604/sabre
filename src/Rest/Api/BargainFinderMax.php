@@ -3,12 +3,15 @@ namespace Tanvir\Sabre\Rest\Api;
 use Tanvir\Sabre\Rest\Call;
 class BargainFinderMax{
     
-    public function __construct($origin, $destination, $departureDate)
+    public function __construct($params)
     {
         $this->path = '/v1/offers/shop';
-        $this->origin = $origin;
-        $this->destination = $destination;
-        $this->departureDate = $departureDate;
+        $this->params = $params;
+        if(!$this->validateParams()){
+          throw new \Exception("Error Processing Request. Required parameter not found!", 1);
+          
+        }
+
     }
     
     public function run()
@@ -18,23 +21,39 @@ class BargainFinderMax{
         return $result;
     }
 
+    public function validateParams()
+    {
+      if (empty($this->params)) {
+        return false;
+      }
+      if (empty($this->params['OriginDestinationInformation']) || empty($this->params['PassengerTypeQuantity'])) {
+        return false;
+      }
+
+      return true;
+    }
+
 
     private function getRequest() {
         $request = '
           {
             "OTA_AirLowFareSearchRQ": {
-              "OriginDestinationInformation": [
-                {
-                  "DepartureDateTime": "'.$this->departureDate.'T00:00:00",
+              "OriginDestinationInformation": [';
+              foreach ($this->params['OriginDestinationInformation'] as $key => $value) {
+                $request .= '{
+                  "DepartureDateTime": "'.$value['DepartureDateTime'].'T00:00:00",
                   "DestinationLocation": {
-                    "LocationCode": "'.$this->destination.'"
+                    "LocationCode": "'.$value['DestinationLocation'].'"
                   },
                   "OriginLocation": {
-                    "LocationCode": "'.$this->origin.'"
+                    "LocationCode": "'.$value['OriginLocation'].'"
                   },
-                  "RPH": "0"
-                }
-              ],
+                  "RPH": "'.$key.'"
+                }';
+              }
+                 
+
+              $request .= '],
               "POS": {
                 "Source": [
                   {
@@ -69,12 +88,16 @@ class BargainFinderMax{
               "TravelerInfoSummary": {
                 "AirTravelerAvail": [
                   {
-                    "PassengerTypeQuantity": [
-                      {
-                        "Code": "ADT",
-                        "Quantity": 1
-                      }
-                    ]
+                    "PassengerTypeQuantity": [';
+
+                    foreach ($this->params['PassengerTypeQuantity'] as $key => $value) {
+
+                      $request .= '{
+                        "Code": "'.$value['Code'].'",
+                        "Quantity": '.$value['Quantity'].'
+                      }';
+                    }
+                    $request .= ']
                   }
                 ],
                 "SeatsRequested": [

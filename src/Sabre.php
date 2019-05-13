@@ -9,8 +9,8 @@ class Sabre{
         }
         
     }
-    public function bergainFinderMax($origin, $destination, $departureDate)
+    public function bergainFinderMax($params)
     {
-        return $this->api->bergainFinderMax($origin, $destination, $departureDate);
+        return $this->api->bergainFinderMax($params);
     }
 }

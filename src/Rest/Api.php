@@ -10,9 +10,9 @@ class Api{
         $result = $Call->executePostCall($path, $request);
         return $result;
     }
-    public function bergainFinderMax($origin, $destination, $departureDate)
+    public function bergainFinderMax($params)
     {
-        $BargainFinderMax = new BargainFinderMax($origin, $destination, $departureDate);
+        $BargainFinderMax = new BargainFinderMax($params);
         return $BargainFinderMax->run();
     }
 }
