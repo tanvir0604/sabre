@@ -50,6 +50,7 @@ class BargainFinderMax{
                   },
                   "RPH": "'.$key.'"
                 }';
+                if($key < count($this->params['OriginDestinationInformation'])-1){ $request .= ','; }
               }
                  
 
@@ -96,12 +97,13 @@ class BargainFinderMax{
                         "Code": "'.$value['Code'].'",
                         "Quantity": '.$value['Quantity'].'
                       }';
+                      if($key < count($this->params['PassengerTypeQuantity'])-1){ $request .= ','; }
                     }
                     $request .= ']
                   }
                 ],
                 "SeatsRequested": [
-                  1
+                  '.$this->params['SeatsRequested'].'
                 ]
               },
               "Version": "1"
