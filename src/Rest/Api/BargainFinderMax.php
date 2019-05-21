@@ -3,7 +3,7 @@ namespace Tanvir\Sabre\Rest\Api;
 use Tanvir\Sabre\Rest\Call;
 class BargainFinderMax{
     
-    public function __construct($params)
+    public function __construct(Array $params)
     {
         $this->path = '/v1/offers/shop';
         $this->params = $params;

@@ -18,4 +18,8 @@ class Sabre{
     {
         return $this->api->bergainFinderMax($params);
     }
+    public function AirlineLookup(Array $params)
+    {
+        return $this->api->AirlineLookup($params);
+    }
 }

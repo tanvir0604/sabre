@@ -1,6 +1,7 @@
 <?php
 namespace Tanvir\Sabre\Rest;
 use Tanvir\Sabre\Rest\Api\BargainFinderMax;
+use Tanvir\Sabre\Rest\Api\AirlineLookup;
 use Tanvir\Sabre\Rest\Call;
 class Api{
 
@@ -14,5 +15,10 @@ class Api{
     {
         $BargainFinderMax = new BargainFinderMax($params);
         return $BargainFinderMax->run();
+    }
+    public function AirlineLookup(Array $params)
+    {
+        $AirlineLookup = new AirlineLookup($params);
+        return $AirlineLookup->run();
     }
 }
