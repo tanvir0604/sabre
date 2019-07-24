@@ -5,8 +5,6 @@ class Auth{
     public function __construct() {
         $this->config = config('sabre')[config('sabre.env')];
         $this->url = $this->config['rest'].'/v2/auth/token';
-        $this->clientId = "V1:ctyk3ou66mgrtghg:DEVCENTER:EXT";
-        $this->password = "Hs26JuSi";
     }
 
     public function callForToken() {

@@ -24,6 +24,7 @@ class Call {
     private function buildHeaders() {
         $headers = array(
             'Authorization: Bearer '.Token::getToken()->access_token,
+            // 'Authorization: Bearer '.'T1RLAQJ+drM7lsPxai7p2/DI9Qcms+rtOBAUwVWDej8NL7Pw+uzkW7AEAADAEi6jC1K5yE0G/nn7qZa8OSud7JsIcBjKoSsXC+nWSJxpmkA8y+E6OuVOgqpHUnOg6vZ+bdAVm+i8gsCfwp424JqIoF79JfJLzHE4Ihej4alwMirOjvgO0JWEbJnVZfPqqLwll1EZZ+RudLSsa2P6mddtZZw0pJc8oQ2POqAjE/YypnioeGaunMaXSnjAOJybDercGQTAkrNuCp7NY6/q5ba3zJ46ThMtAXgP+bj2vVKUqzMlQUHI/TZ5jP24LIIW',
             'Accept: */*'
         );
         return $headers;

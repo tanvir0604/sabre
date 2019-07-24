@@ -8,11 +8,26 @@ class BargainFinderMax {
 
     private $config;
     
-    public function __construct($origin, $destination, $departureDate) {
+    public function __construct(Array $params) {
         $this->config = config('sabre')[config('sabre.env')];
-        $this->origin = $origin;
-        $this->destination = $destination;
-        $this->departureDate = $departureDate;
+        $this->params = $params;
+        if(!$this->validateParams()){
+          throw new \Exception("Error Processing Request. Required parameter not found!", 1);
+          
+        }
+    }
+
+
+    public function validateParams()
+    {
+      if (empty($this->params)) {
+        return false;
+      }
+      if (empty($this->params['OriginDestinationInformation']) || empty($this->params['PassengerTypeQuantity'])) {
+        return false;
+      }
+
+      return true;
     }
     
     public function run() {
@@ -42,9 +57,9 @@ class BargainFinderMax {
                 )
             ),
             "OriginDestinationInformation" => array(
-                "DepartureDateTime" => $this->departureDate.'T00:00:00',
-                "OriginLocation" => array("_attributes" => array("LocationCode"=> $this->origin)),
-                "DestinationLocation" => array("_attributes" => array("LocationCode"=> $this->destination)),
+                "DepartureDateTime" => '2019-07-20T00:00:00',
+                "OriginLocation" => array("_attributes" => array("LocationCode"=> "LHR")),
+                "DestinationLocation" => array("_attributes" => array("LocationCode"=> "BOM")),
                 "TPA_Extensions" => array(
                     "SegmentType" => array("_attributes" => array("Code" => "O"))
                 )

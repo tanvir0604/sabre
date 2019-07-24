@@ -14,12 +14,17 @@ class Sabre{
         return $this->api->call($param1, $param2);
     }
 
-    public function bergainFinderMax($params)
+    public function BargainFinderMax($params)
     {
-        return $this->api->bergainFinderMax($params);
+        return $this->api->BargainFinderMax($params);
     }
     public function AirlineLookup(Array $params)
     {
         return $this->api->AirlineLookup($params);
+    }
+    public function AlternateAirportShop(Array $params)
+    {
+        //rest and soap
+        return $this->api->AlternateAirportShop($params);
     }
 }

@@ -2,6 +2,8 @@
 namespace Tanvir\Sabre\Soap;
 use Tanvir\Sabre\Soap\Call;
 use Tanvir\Sabre\Soap\Api\BargainFinderMax;
+use Tanvir\Sabre\Soap\Api\AlternateAirportShop;
+
 class Api{
 
     public function call($action, $request)
@@ -11,9 +13,14 @@ class Api{
         $result = $soapClient->doCall($request);
         return $result;
     }
-    public function bergainFinderMax($origin, $destination, $departureDate)
+    public function BargainFinderMax(Array $params)
     {
-        $BargainFinderMax = new BargainFinderMax($origin, $destination, $departureDate);
+        $BargainFinderMax = new BargainFinderMax($params);
         return json_decode(json_encode($BargainFinderMax->run()), TRUE);
+    }
+    public function AlternateAirportShop(Array $params)
+    {
+        $AlternateAirportShop = new AlternateAirportShop($params);
+        return json_decode(json_encode($AlternateAirportShop->run()), TRUE);
     }
 }

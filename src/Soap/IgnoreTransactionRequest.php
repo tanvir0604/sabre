@@ -10,9 +10,9 @@ class IgnoreTransactionRequest {
     }
     
     public function executeRequest($security) {
-        $client = new SoapClient("soap/wsdls/IgnoreTransactionLLSRQ/IgnoreTransactionLLS2.0.0RQ.wsdl", 
-                array("uri" => $this->config['environment'],
-                    "location" => $this->config['environment'],
+        $client = new \SoapClient("sabre/wsdls/IgnoreTransactionLLSRQ/IgnoreTransactionLLS2.0.0RQ.wsdl", 
+                array("uri" => $this->config['soap'],
+                    "location" => $this->config['soap'],
                     "encoding" => "utf-8",
                     "trace" => true,
                     'cache_wsdl' => WSDL_CACHE_NONE));
@@ -31,7 +31,7 @@ class IgnoreTransactionRequest {
         $securityArray = array(
             "BinarySecurityToken" => $security->BinarySecurityToken
         );
-        return new SoapHeader("http://schemas.xmlsoap.org/ws/2002/12/secext", "Security", $securityArray, 1);
+        return new \SoapHeader("http://schemas.xmlsoap.org/ws/2002/12/secext", "Security", $securityArray, 1);
     }
     
     private function createRequestBody() {
