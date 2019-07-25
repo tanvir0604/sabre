@@ -3,6 +3,7 @@ namespace Tanvir\Sabre\Rest;
 use Tanvir\Sabre\Rest\Api\BargainFinderMax;
 use Tanvir\Sabre\Rest\Api\AlternateAirportShop;
 use Tanvir\Sabre\Rest\Api\AirlineLookup;
+use Tanvir\Sabre\Rest\Api\CreatePassengerNameRecord;
 use Tanvir\Sabre\Rest\Call;
 class Api{
 
@@ -20,6 +21,11 @@ class Api{
     public function AlternateAirportShop(Array $params)
     {
         $BargainFinderMax = new AlternateAirportShop($params);
+        return $BargainFinderMax->run();
+    }
+    public function CreatePassengerNameRecord(Array $params)
+    {
+        $BargainFinderMax = new CreatePassengerNameRecord($params);
         return $BargainFinderMax->run();
     }
     public function AirlineLookup(Array $params)

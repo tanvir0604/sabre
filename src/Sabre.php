@@ -27,4 +27,9 @@ class Sabre{
         //rest and soap
         return $this->api->AlternateAirportShop($params);
     }
+    public function CreatePassengerNameRecord(Array $params)
+    {
+        //rest and soap
+        return $this->api->CreatePassengerNameRecord($params);
+    }
 }
