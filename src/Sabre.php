@@ -32,4 +32,9 @@ class Sabre{
         //rest and soap
         return $this->api->CreatePassengerNameRecord($params);
     }
+    public function GetCurrencyConversion(String $params)
+    {
+        //soap only
+        return $this->api->GetCurrencyConversion($params);
+    }
 }
