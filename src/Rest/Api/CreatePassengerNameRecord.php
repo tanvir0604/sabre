@@ -4,6 +4,7 @@ use Tanvir\Sabre\Rest\Call;
 class CreatePassengerNameRecord{
     public function __construct($params)
     {
+        // dd($params);
         $this->path = '/v2.2.0/passenger/records?mode=create';
         $this->params = $params;
         if(!$this->validateParams()){
@@ -14,6 +15,7 @@ class CreatePassengerNameRecord{
     public function run()
     {
         $Call = new Call();
+        // dd($this->getRequest());
         $result = $Call->executePostCall($this->path, $this->getRequest());
         return $result;
     }
@@ -36,7 +38,6 @@ class CreatePassengerNameRecord{
         {
             "CreatePassengerNameRecordRQ": {
               "version": "2.2.0",
-              "targetCity": "TM61",
               "haltOnAirPriceError": false,
               "TravelItineraryAddInfo": {
                 "AgencyInfo": {
@@ -64,15 +65,18 @@ class CreatePassengerNameRecord{
                       }
                     ]
                   },
-                  "PersonName": [
-                    {
+                  "PersonName": [';
+                    foreach($this->params['passangerInfo'] as $key => $p){
+                    $request .='{
                       "NameNumber": "1.1",
                       "NameReference": "ABC123",
-                      "PassengerType": "ADT",
-                      "GivenName": "MARCIN",
-                      "Surname": "DZIK"
+                      "PassengerType": "'.$p['type'].'",
+                      "GivenName": "'.$p['info']->first_name.'",
+                      "Surname": "'.$p['info']->last_name.'"
+                    }';
+                    if($key < count($this->params['passangerInfo'])-1){ $request .= ','; }
                     }
-                  ]
+                  $request .=']
                 }
               },
               "AirBook": {
@@ -100,26 +104,39 @@ class CreatePassengerNameRecord{
                   }
                 ],
                 "OriginDestinationInformation": {
-                  "FlightSegment": [
-                    {
-                      "ArrivalDateTime": "2019-09-15T23:01:00",
-                      "DepartureDateTime": "2019-09-15T18:15:00",
-                      "FlightNumber": "2609",
-                      "NumberInParty": "1",
-                      "ResBookDesigCode": "Y",
-                      "Status": "NN",
-                      "DestinationLocation": {
-                        "LocationCode": "DFW"
-                      },
-                      "MarketingAirline": {
-                        "Code": "AA",
-                        "FlightNumber": "2609"
-                      },
-                      "OriginLocation": {
-                        "LocationCode": "LAS"
+                  "FlightSegment": [';
+                  foreach($this->params['flights'] as $key1 => $flight){
+                    foreach($flight['scheduleDesc'] as $key2 => $schedule){
+                      $date = $flight['departure_date'];
+                      if(isset($flight['schedules'][$key2]['departureDateAdjustment'])){
+                        $date = date('Y-m-d', strtotime($date. ' + '.$flight['schedules'][$key2]['departureDateAdjustment'].' days'));
+                      }
+                      
+                      $request .='
+                        {
+                          "ArrivalDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['arrival']['time'], 0, 8))).'",
+                          "DepartureDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['departure']['time'], 0, 8))).'",
+                          "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'",
+                          "NumberInParty": "1",
+                          "ResBookDesigCode": "Y",
+                          "Status": "NN",
+                          "DestinationLocation": {
+                            "LocationCode": "'.$schedule['arrival']['airport'].'"
+                          },
+                          "MarketingAirline": {
+                            "Code": "'.$schedule['carrier']['marketing'].'",
+                            "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'"
+                          },
+                          "OriginLocation": {
+                            "LocationCode": "'.$schedule['departure']['airport'].'"
+                          }
+                        }';
+                        if($key1 == count($this->params['flights'])-1 && $key2 == count($this->params['flights'][$key1]['scheduleDesc'])-1 ){ 
+                          $request .= ' '; 
+                        }else{$request .= ',';}
                       }
                     }
-                  ]
+                  $request .= ']
                 },
                 "RedisplayReservation": {
                   "NumAttempts": 10,
@@ -137,12 +154,18 @@ class CreatePassengerNameRecord{
                         }
                       },
                       "PricingQualifiers": {
-                        "PassengerType": [
+                        "PassengerType": [';
+                        $count = 0;
+                        foreach($this->params['passangers'] as $key=>$value){
+                          $count ++;
+                        $request .='
                           {
-                            "Code": "ADT",
-                            "Quantity": "1"
-                          }
-                        ]
+                            "Code": "'.$key.'",
+                            "Quantity": "'.$value.'"
+                          }';
+                          if($count < count($this->params['passangers'])){ $request .= ','; }
+                        }
+                        $request .=']
                       }
                     }
                   }
