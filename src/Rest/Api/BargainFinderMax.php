@@ -5,6 +5,8 @@ class BargainFinderMax{
     
     public function __construct(Array $params)
     {
+        $this->config = config('sabre')[config('sabre.env')];
+        // dd($this->config);
         $this->path = '/v1/offers/shop';
         $this->params = $params;
         if(!$this->validateParams()){
@@ -17,6 +19,7 @@ class BargainFinderMax{
     public function run()
     {
         $Call = new Call();
+        // dd($this->getRequest());
         $result = $Call->executePostCall($this->path, $this->getRequest());
         return $result;
     }
@@ -58,7 +61,7 @@ class BargainFinderMax{
               "POS": {
                 "Source": [
                   {
-                    "PseudoCityCode": "F9CE",
+                    "PseudoCityCode": "'.$this->config['group'].'",
                     "RequestorID": {
                       "CompanyName": {
                         "Code": "TN"

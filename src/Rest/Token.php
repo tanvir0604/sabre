@@ -13,6 +13,7 @@ class Token {
             Token::$expirationDate = time() + Token::$token->expires_in;
             
         }
+        // dd(Token::$token);
         return Token::$token;
     }
 }

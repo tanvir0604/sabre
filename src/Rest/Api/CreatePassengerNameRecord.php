@@ -5,6 +5,7 @@ class CreatePassengerNameRecord{
     public function __construct($params)
     {
         // dd($params);
+        $this->config = config('sabre')[config('sabre.env')];
         $this->path = '/v2.2.0/passenger/records?mode=create';
         $this->params = $params;
         if(!$this->validateParams()){
@@ -34,10 +35,101 @@ class CreatePassengerNameRecord{
 
 
     private function getRequest() {
+
+      $personName = [];
+      foreach($this->params['passangerInfo'] as $key => $p){
+        $personName[] = '{
+          "NameNumber": "'.($key+1).'.1",
+          "NameReference": "'.$p['indicator'].'",
+          "PassengerType": "'.$p['type'].'",
+          "GivenName": "'.$p['info']->first_name.'",
+          "Surname": "'.$p['info']->last_name.'",
+          "Infant": '.($p['type']=='INF'?'true':'false').'
+        }';
+      }
+
+      $personNameWithoutInfant = [];
+      foreach($this->params['passangerInfo'] as $key => $p){
+        if($p['type'] != 'INF'){
+          $personNameWithoutInfant[]=' {
+            "SegmentNumber": "A",
+            "PersonName": {
+              "DateOfBirth": "'.(date('Y-m-d', strtotime($p['info']->dob))).'",
+              "Gender": "M",
+              "NameNumber": "'.($key+1).'.1",
+              "GivenName": "'.$p['info']->first_name.'",
+              "Surname": "'.$p['info']->last_name.'"
+            },
+            "VendorPrefs": {
+              "Airline": {
+                "Hosted": true
+              }
+            }
+          }';
+      
+        }
+      }
+
+      $service = [];
+      
+      foreach($this->params['passangerInfo'] as $key => $p){
+        if($p['type'] == 'INF'){
+          $service[] ='
+            {
+              "PersonName": {
+                  "NameNumber": "'.$key.'.1"
+              },
+              "SSR_Code": "INFT",
+              "Text": "'.$p['info']->last_name.'/'.$p['info']->first_name.'/'.(date('jMy', strtotime($p['info']->dob))).'"
+            }
+          ';      
+        }
+      }
+
+
+      $flightSegment = [];
+      foreach($this->params['flights'] as $key1 => $flight){
+        foreach($flight['scheduleDesc'] as $key2 => $schedule){
+          $date = $flight['departure_date'];
+          if(isset($flight['schedules'][$key2]['departureDateAdjustment'])){
+            $date = date('Y-m-d', strtotime($date. ' + '.$flight['schedules'][$key2]['departureDateAdjustment'].' days'));
+          }
+          
+          $flightSegment[] ='
+            {
+              "ArrivalDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['arrival']['time'], 0, 8))).'",
+              "DepartureDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['departure']['time'], 0, 8))).'",
+              "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'",
+              "NumberInParty": "1",
+              "ResBookDesigCode": "Y",
+              "Status": "NN",
+              "DestinationLocation": {
+                "LocationCode": "'.$schedule['arrival']['airport'].'"
+              },
+              "MarketingAirline": {
+                "Code": "'.$schedule['carrier']['marketing'].'",
+                "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'"
+              },
+              "OriginLocation": {
+                "LocationCode": "'.$schedule['departure']['airport'].'"
+              }
+            }';
+          }
+        }
+
+        $passengerType = [];
+        foreach($this->params['passangers'] as $key => $p){
+          $passengerType[] ='{
+            "Code": "'.$key.'",
+            "Quantity": "'.$p.'"
+          }';        
+        }
+
         $request = '
         {
             "CreatePassengerNameRecordRQ": {
               "version": "2.2.0",
+              "targetCity": "'.$this->config['group'].'",
               "haltOnAirPriceError": false,
               "TravelItineraryAddInfo": {
                 "AgencyInfo": {
@@ -66,19 +158,38 @@ class CreatePassengerNameRecord{
                     ]
                   },
                   "PersonName": [';
-                    foreach($this->params['passangerInfo'] as $key => $p){
-                    $request .='{
-                      "NameNumber": "1.1",
-                      "NameReference": "ABC123",
-                      "PassengerType": "'.$p['type'].'",
-                      "GivenName": "'.$p['info']->first_name.'",
-                      "Surname": "'.$p['info']->last_name.'"
-                    }';
-                    if($key < count($this->params['passangerInfo'])-1){ $request .= ','; }
-                    }
+                    $request .= implode(',', $personName);
                   $request .=']
                 }
               },
+
+
+
+              "SpecialReqDetails": {
+                "AddRemark": {
+                  "RemarkInfo": {
+                    "FOP_Remark": {
+                      "Type": "CHECK"
+                    }
+                  }
+                },
+                "SpecialService": {
+                  "SpecialServiceInfo": {
+                    "SecureFlight": [';
+                    $request .= implode(',', $personNameWithoutInfant);
+                  $request .='],
+                    "Service": [';
+                    $request .= implode(',', $service);
+                  $request .=']
+                  }
+                }
+              },
+
+
+
+
+              
+
               "AirBook": {
                 "HaltOnStatus": [
                   {
@@ -105,37 +216,7 @@ class CreatePassengerNameRecord{
                 ],
                 "OriginDestinationInformation": {
                   "FlightSegment": [';
-                  foreach($this->params['flights'] as $key1 => $flight){
-                    foreach($flight['scheduleDesc'] as $key2 => $schedule){
-                      $date = $flight['departure_date'];
-                      if(isset($flight['schedules'][$key2]['departureDateAdjustment'])){
-                        $date = date('Y-m-d', strtotime($date. ' + '.$flight['schedules'][$key2]['departureDateAdjustment'].' days'));
-                      }
-                      
-                      $request .='
-                        {
-                          "ArrivalDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['arrival']['time'], 0, 8))).'",
-                          "DepartureDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['departure']['time'], 0, 8))).'",
-                          "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'",
-                          "NumberInParty": "1",
-                          "ResBookDesigCode": "Y",
-                          "Status": "NN",
-                          "DestinationLocation": {
-                            "LocationCode": "'.$schedule['arrival']['airport'].'"
-                          },
-                          "MarketingAirline": {
-                            "Code": "'.$schedule['carrier']['marketing'].'",
-                            "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'"
-                          },
-                          "OriginLocation": {
-                            "LocationCode": "'.$schedule['departure']['airport'].'"
-                          }
-                        }';
-                        if($key1 == count($this->params['flights'])-1 && $key2 == count($this->params['flights'][$key1]['scheduleDesc'])-1 ){ 
-                          $request .= ' '; 
-                        }else{$request .= ',';}
-                      }
-                    }
+                  $request .= implode(',', $flightSegment);
                   $request .= ']
                 },
                 "RedisplayReservation": {
@@ -143,6 +224,9 @@ class CreatePassengerNameRecord{
                   "WaitInterval": 300
                 }
               },
+
+
+
               "AirPrice": [
                 {
                   "PriceRequestInformation": {
@@ -155,155 +239,20 @@ class CreatePassengerNameRecord{
                       },
                       "PricingQualifiers": {
                         "PassengerType": [';
-                        $count = 0;
-                        foreach($this->params['passangers'] as $key=>$value){
-                          $count ++;
-                        $request .='
-                          {
-                            "Code": "'.$key.'",
-                            "Quantity": "'.$value.'"
-                          }';
-                          if($count < count($this->params['passangers'])){ $request .= ','; }
-                        }
+                        $request .= implode(',', $passengerType);
                         $request .=']
                       }
                     }
                   }
                 }
               ],
-              "HotelBook": {
-                "BookingInfo": {
-                  "BookingKey": "80c8aac8-bc75-42f7-9266-339103f1258d",
-                  "RequestorID": "SG000000"
-                },
-                "Rooms": {
-                  "Room": [
-                    {
-                      "Guests": {
-                        "Guest": [
-                          {
-                            "Contact": {
-                              "Phone": "817-555-1212"
-                            },
-                            "FirstName": "MARCIN",
-                            "LastName": "DZIK",
-                            "Index": 1,
-                            "LeadGuest": true,
-                            "Type": 10,
-                            "Email": "Witold.Petriczek@sabre.com"
-                          }
-                        ]
-                      },
-                      "RoomIndex": 1
-                    }
-                  ]
-                },
-                "PaymentInformation": {
-                  "FormOfPayment": {
-                    "PaymentCard": {
-                      "PaymentType": "CC",
-                      "CardCode": "VI",
-                      "CardNumber": "4000000000006",
-                      "ExpiryMonth": 6,
-                      "ExpiryYear": "2021",
-                      "FullCardHolderName": {
-                        "FirstName": "MARCIN",
-                        "LastName": "DZIK",
-                        "Email": "Witold.Petriczek@sabre.com"
-                      },
-                      "CSC": "123",
-                      "Address": {
-                        "AddressLine": [
-                          "Wadowicka 6"
-                        ],
-                        "CityName": "Krakow",
-                        "StateProvince": {
-                          "code": "KR"
-                        },
-                        "StateProvinceCodes": {
-                          "Code": [
-                            {
-                              "content": "KR"
-                            }
-                          ]
-                        },
-                        "PostCode": "30-415",
-                        "CountryCodes": {
-                          "Code": [
-                            {
-                              "content": "PL"
-                            }
-                          ]
-                        }
-                      },
-                      "Phone": {
-                        "PhoneNumber": "817-555-1212"
-                      }
-                    }
-                  },
-                  "Type": "GUARANTEE"
-                },
-                "POS": {
-                  "Source": {
-                    "RequestorID": {
-                      "Type": 5,
-                      "Id": "12345678",
-                      "IdContext": "IATA"
-                    },
-                    "AgencyAddress": {
-                      "AddressLine1": "3150 SABRE DRIVE",
-                      "CityName": {},
-                      "CountryName": {
-                        "Code": "US"
-                      }
-                    },
-                    "AgencyName": "Really Trustworthy Agency",
-                    "ISOCountryCode": "US",
-                    "PseudoCityCode": "TM61"
-                  }
-                }
-              },
-              "SpecialReqDetails": {
-                "AddRemark": {
-                  "RemarkInfo": {
-                    "FOP_Remark": {
-                      "Type": "CHECK"
-                    }
-                  }
-                },
-                "SpecialService": {
-                  "SpecialServiceInfo": {
-                    "SecureFlight": [
-                      {
-                        "SegmentNumber": "A",
-                        "PersonName": {
-                          "DateOfBirth": "2001-01-01",
-                          "Gender": "M",
-                          "NameNumber": "1.1",
-                          "GivenName": "MARCIN",
-                          "Surname": "DZIK"
-                        },
-                        "VendorPrefs": {
-                          "Airline": {
-                            "Hosted": true
-                          }
-                        }
-                      }
-                    ],
-                    "Service": [
-                      {
-                        "SSR_Code": "OTHS",
-                        "Text": "CC MARCIN DZIK"
-                      }
-                    ]
-                  }
-                }
-              },
+              
+              
               "PostProcessing": {
-                "ARUNK": {},
+                
                 "EndTransaction": {
                   "Source": {
-                    "ReceivedFrom": "SP TEST"
+                    "ReceivedFrom": "SP WEB"
                   }
                 },
                 "RedisplayReservation": {

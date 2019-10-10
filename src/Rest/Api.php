@@ -4,6 +4,7 @@ use Tanvir\Sabre\Rest\Api\BargainFinderMax;
 use Tanvir\Sabre\Rest\Api\AlternateAirportShop;
 use Tanvir\Sabre\Rest\Api\AirlineLookup;
 use Tanvir\Sabre\Rest\Api\CreatePassengerNameRecord;
+use Tanvir\Sabre\Rest\Api\EnhancedAirTicket;
 use Tanvir\Sabre\Rest\Call;
 class Api{
 
@@ -25,8 +26,13 @@ class Api{
     }
     public function CreatePassengerNameRecord(Array $params)
     {
-        $BargainFinderMax = new CreatePassengerNameRecord($params);
-        return $BargainFinderMax->run();
+        $CreatePassengerNameRecord = new CreatePassengerNameRecord($params);
+        return $CreatePassengerNameRecord->run();
+    }
+    public function EnhancedAirTicket(String $pnr)
+    {
+        $EnhancedAirTicket = new EnhancedAirTicket($pnr);
+        return $EnhancedAirTicket->run();
     }
     public function AirlineLookup(Array $params)
     {

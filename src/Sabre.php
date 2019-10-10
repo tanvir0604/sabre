@@ -29,8 +29,13 @@ class Sabre{
     }
     public function CreatePassengerNameRecord(Array $params)
     {
-        //rest and soap
+        //rest only
         return $this->api->CreatePassengerNameRecord($params);
+    }
+    public function EnhancedAirTicket(String $params)
+    {
+        //rest only
+        return $this->api->EnhancedAirTicket($params);
     }
     public function GetCurrencyConversion(String $params)
     {
