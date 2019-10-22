@@ -40,11 +40,9 @@ class CreatePassengerNameRecord{
       foreach($this->params['passangerInfo'] as $key => $p){
         $personName[] = '{
           "NameNumber": "'.($key+1).'.1",
-          "NameReference": "'.$p['indicator'].'",
           "PassengerType": "'.$p['type'].'",
           "GivenName": "'.$p['info']->first_name.'",
-          "Surname": "'.$p['info']->last_name.'",
-          "Infant": '.($p['type']=='INF'?'true':'false').'
+          "Surname": "'.$p['info']->last_name.'"
         }';
       }
 
@@ -62,7 +60,7 @@ class CreatePassengerNameRecord{
             },
             "VendorPrefs": {
               "Airline": {
-                "Hosted": true
+                "Hosted": false
               }
             }
           }';
@@ -165,25 +163,7 @@ class CreatePassengerNameRecord{
 
 
 
-              "SpecialReqDetails": {
-                "AddRemark": {
-                  "RemarkInfo": {
-                    "FOP_Remark": {
-                      "Type": "CHECK"
-                    }
-                  }
-                },
-                "SpecialService": {
-                  "SpecialServiceInfo": {
-                    "SecureFlight": [';
-                    $request .= implode(',', $personNameWithoutInfant);
-                  $request .='],
-                    "Service": [';
-                    $request .= implode(',', $service);
-                  $request .=']
-                  }
-                }
-              },
+              
 
 
 
