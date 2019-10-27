@@ -117,10 +117,12 @@ class CreatePassengerNameRecord{
 
         $passengerType = [];
         foreach($this->params['passangers'] as $key => $p){
-          $passengerType[] ='{
-            "Code": "'.$key.'",
-            "Quantity": "'.$p.'"
-          }';        
+          if($p > 0){
+            $passengerType[] ='{
+              "Code": "'.$key.'",
+              "Quantity": "'.$p.'"
+            }';    
+          }    
         }
 
         $request = '
