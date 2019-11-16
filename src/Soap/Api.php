@@ -4,6 +4,7 @@ use Tanvir\Sabre\Soap\Call;
 use Tanvir\Sabre\Soap\Api\BargainFinderMax;
 use Tanvir\Sabre\Soap\Api\AlternateAirportShop;
 use Tanvir\Sabre\Soap\Api\GetCurrencyConversion;
+use Tanvir\Sabre\Soap\Api\GetETicketDetails;
 
 class Api{
 
@@ -28,5 +29,10 @@ class Api{
     {
         $GetCurrencyConversion = new GetCurrencyConversion($params);
         return json_decode(json_encode($GetCurrencyConversion->run()), TRUE);
+    }
+    public function GetETicketDetails(String $ticket)
+    {
+        $GetETicketDetails = new GetETicketDetails($ticket);
+        return json_decode(json_encode($GetETicketDetails->run()), TRUE);
     }
 }

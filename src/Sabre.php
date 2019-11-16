@@ -42,4 +42,10 @@ class Sabre{
         //soap only
         return $this->api->GetCurrencyConversion($params);
     }
+
+    public function GetETicketDetails(String $ticket)
+    {
+        //soap only
+        return $this->api->GetETicketDetails($ticket);
+    }
 }

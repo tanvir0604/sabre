@@ -98,7 +98,7 @@ class CreatePassengerNameRecord{
               "ArrivalDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['arrival']['time'], 0, 8))).'",
               "DepartureDateTime": "'.$date.'T'.date("H:i:s", strtotime(substr($schedule['departure']['time'], 0, 8))).'",
               "FlightNumber": "'.$schedule['carrier']['marketingFlightNumber'].'",
-              "NumberInParty": "1",
+              "NumberInParty": "'.count($personName).'",
               "ResBookDesigCode": "Y",
               "Status": "NN",
               "DestinationLocation": {
