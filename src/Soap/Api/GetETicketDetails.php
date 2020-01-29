@@ -42,7 +42,7 @@ class GetETicketDetails {
 
     private function stringReq(){
         return '
-        <eTicketCouponRQ Version="2.0.0">
+        <eTicketCouponRQ Version="2.0.0" xmlns="http://webservices.sabre.com/sabreXML/2011/10">
             <Ticketing eTicketNumber="'.$this->ticket.'"/>
         </eTicketCouponRQ>
         ';

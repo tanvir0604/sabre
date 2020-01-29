@@ -4,7 +4,7 @@ use Tanvir\Sabre\Rest\Call;
 class EnhancedAirTicket{
     public function __construct($pnr, $tax = 7)
     {
-        // dd($params);
+        // dd($pnr);
         $this->config = config('sabre')[config('sabre.env')];
         $this->path = '/v1.2.1/air/ticket';
         $this->pnr = $pnr;

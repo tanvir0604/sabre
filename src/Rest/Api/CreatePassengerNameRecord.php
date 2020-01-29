@@ -38,13 +38,41 @@ class CreatePassengerNameRecord{
 
       $personName = [];
       foreach($this->params['passangerInfo'] as $key => $p){
-        $personName[] = '{
-          "NameNumber": "'.($key+1).'.1",
-          "PassengerType": "'.$p['type'].'",
-          "GivenName": "'.$p['info']->first_name.'",
-          "Surname": "'.$p['info']->last_name.'"
-        }';
+
+        if($p['type'] == 'ADT'){
+          $personName[] = '{
+            "NameNumber": "'.($key+1).'.1",
+            "PassengerType": "'.$p['type'].'",
+            "GivenName": "'.$p['info']->first_name.'",
+            "Surname": "'.$p['info']->last_name.'"
+          }';
+        }
+
+        elseif($p['type'] == 'CNN'){
+          $personName[] = '{
+            "NameNumber": "'.($key+1).'.1",
+            "Infant": false,
+            "NameReference": "C04",
+            "PassengerType": "'.$p['type'].'",
+            "GivenName": "'.$p['info']->first_name.'",
+            "Surname": "'.$p['info']->last_name.'"
+          }';
+
+        }
+
+        elseif($p['type'] == 'INF'){
+          $personName[] = '{
+            "NameNumber": "'.($key+1).'.1",
+            "Infant": false,
+            "PassengerType": "'.$p['type'].'",
+            "GivenName": "'.$p['info']->first_name.'",
+            "Surname": "'.$p['info']->last_name.'"
+          }';
+
+        }
+
       }
+
 
       $personNameWithoutInfant = [];
       foreach($this->params['passangerInfo'] as $key => $p){
@@ -131,6 +159,9 @@ class CreatePassengerNameRecord{
               "version": "2.2.0",
               "targetCity": "'.$this->config['group'].'",
               "haltOnAirPriceError": false,
+
+
+
               "TravelItineraryAddInfo": {
                 "AgencyInfo": {
                   "Address": {
@@ -157,20 +188,13 @@ class CreatePassengerNameRecord{
                       }
                     ]
                   },
+
                   "PersonName": [';
                     $request .= implode(',', $personName);
                   $request .=']
                 }
               },
-
-
-
-              
-
-
-
-
-              
+    
 
               "AirBook": {
                 "HaltOnStatus": [
@@ -228,6 +252,61 @@ class CreatePassengerNameRecord{
                   }
                 }
               ],
+
+
+
+
+               "SpecialReqDetails": {
+                "AddRemark": {
+                  "RemarkInfo": {
+                    "FOP_Remark": {
+                      "Type": "CHECK"
+                    }
+                  }
+                },
+                "SpecialService": {
+                   "SpecialServiceInfo": {
+
+                      "SecureFlight": [
+                        {   
+                        "PersonName": 
+                        {
+                          "DateOfBirth": "1993-10-07",
+                          "Gender": "F",
+                          "NameNumber": "1.1",
+                          "GivenName": "Md",
+                          "Surname": "Hassan"
+                        } ,
+                        "SegmentNumber": "A"    
+                      }],
+                      
+
+                      "SecureFlight": [
+                          {   
+                          "PersonName": 
+                            {
+                              "DateOfBirth": "2009-05-14",
+                              "Gender": "F",
+                              "NameNumber": "2.1",
+                              "GivenName": "mim",
+                              "Surname": "khan"
+                            } ,
+                            "SegmentNumber": "A"    
+                        }],
+
+                      "Service": [
+                      {
+                        "PersonName": 
+                        {
+                          "NameNumber": "2.1"
+                        },
+                        "SSR_Code": "CHLD",
+                        "Text": "01MAY07"
+
+                      }]
+                   }
+                }
+              },
               
               
               "PostProcessing": {
